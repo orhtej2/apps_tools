@@ -530,7 +530,7 @@ class AppAutoUpdater:
             )
             latest_release = releases[latest_version_orig]
             latest_assets = [
-                AssetInfo(a["browser_download_url"], a["name"], a.get["digest"].replace("sha256:", "") if a.get("digest") else None)
+                AssetInfo(a["browser_download_url"], a["name"], a["digest"].replace("sha256:", "") if a.get("digest") else None)
                 for a in latest_release["assets"]
                 if not a["name"].endswith(".md5")
             ]
@@ -838,11 +838,14 @@ def main() -> None:
         logging.error("--pr requires --commit")
         sys.exit(1)
 
-    get_apps_repo.from_args(args)
-    cache_path = get_apps_repo.cache_path(args)
-
     # Handle apps or no apps
-    apps = list(args.apps) if args.apps else apps_to_run_auto_update_for(cache_path)
+    apps = []
+    if args.apps:
+        apps = list(args.apps)
+    else:
+        get_apps_repo.from_args(args)
+        cache_path = get_apps_repo.cache_path(args)
+        apps_to_run_auto_update_for(cache_path)
     apps_already = {}  # for which a PR already exists
     apps_updated = {}
     apps_failed = {}
