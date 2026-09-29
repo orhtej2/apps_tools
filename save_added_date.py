@@ -64,7 +64,7 @@ def app_is_present(commit: Commit, name: str) -> bool:
 def app_is_deprecated(commit: Commit, name: str) -> bool:
     info = get_app_info(commit, "apps", name)
     if info is None:
-        return False
+        raise Exception() # Let the bisect step forward
 
     antifeatures = info.get("antifeatures", [])
     return "deprecated-software" in antifeatures
@@ -122,7 +122,7 @@ def add_apparition_dates(repo: Repo, file: Path, key: str) -> None:
     for app, info in document.items():
         if key in info.keys():
             continue
-        logging.info(f"Searching added date for {key}...")
+        logging.info(f"Searching added date for {app}...")
         date = date_added_to(repo, f"[{app}]", file)
         assert date is not None
         info[key] = date
